@@ -1,0 +1,56 @@
+// Define pins
+const int solarPanelPin = A0;   // Analog pin for reading solar panel voltage
+const int batteryPin = A1;      // Analog pin for reading battery voltage
+const int chargePin = 9;        // Digital pin for controlling charge relay
+
+// Define voltage thresholds
+const float batteryFullVoltage = 12.6;   // Full battery voltage (in volts)
+const float batteryEmptyVoltage = 10.5;  // Empty battery voltage (in volts)
+
+// Define charging parameters
+const float maxChargeCurrent = 2.0;   // Maximum charging current (in amps)
+
+void setup() {
+  // Set charge pin as output
+  pinMode(chargePin, OUTPUT);
+}
+
+void loop() {
+  // Read solar panel voltage
+  float solarPanelVoltage = readVoltage(solarPanelPin);
+
+  // Read battery voltage
+  float batteryVoltage = readVoltage(batteryPin);
+
+  // Determine charging state
+  if (batteryVoltage < batteryFullVoltage) {
+    // Turn on charge relay
+    digitalWrite(chargePin, HIGH);
+
+    // Limit charging current if necessary
+    float chargeCurrent = maxChargeCurrent;
+    if (batteryVoltage >= batteryEmptyVoltage) {
+      chargeCurrent = maxChargeCurrent * (batteryFullVoltage - batteryVoltage) / (batteryFullVoltage - batteryEmptyVoltage);
+    }
+
+    // Monitor charging current and adjust charge current if needed
+    // (This part of code will depend on the specific charge controller used)
+  } else {
+    // Turn off charge relay
+    digitalWrite(chargePin, LOW);
+  }
+
+  // Wait for a while before taking the next reading
+  delay(1000);
+}
+
+// Function to read voltage from analog pin
+float readVoltage(int pin) {
+  // Read analog value
+  int sensorValue = analogRead(pin);
+
+  // Convert analog value to voltage
+  float voltage = sensorValue * (5.0 / 1023.0); // Assuming a 5V reference voltage
+
+  return voltage;
+}
